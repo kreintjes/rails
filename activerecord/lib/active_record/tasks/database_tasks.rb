@@ -410,7 +410,11 @@ module ActiveRecord
         ActiveRecord::Base.establish_connection(db_config)
 
         if schema_up_to_date?(db_config, format, file)
-          truncate_tables(db_config)
+          unless ENV["SKIP_TEST_DATABASE_TRUNCATE"]
+            truncate_tables(db_config)
+          else
+            Rails.logger.debug("SKIPPED TRUNCATING TABLES")
+          end
         else
           purge(db_config)
           load_schema(db_config, format, file)
